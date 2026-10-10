@@ -104,10 +104,10 @@ footer{color:var(--muted);font-size:12.5px}
 <script>
 (function(){
 var API='https://searchapi.samsung.com/v6/front/b2c/product/';
-var SUFFIXES=['','INS','LXL','XL','XXL','TL','HL','NL','NA','IN'];
+var SUFFIXES=['','INS','INU','LXL','XL','XXL','TL','HL','NL','NA','IN','/XL','/TL','/WW'];
 var SITE='https://www.samsung.com';
 var EXAMPLES=['SM-S948BZKBINS','QA55S95HXULXL','RT56HG7A61SLTL'];
-var KEY_ORDER=[/^Product Type$/i,/Size \(Main Display\)|Screen Size/i,/^Resolution/i,/Technology \(Main Display\)/i,/Refresh Rate/i,/CPU Type|^Processor$/i,/CPU Speed/i,/^Memory \(GB\)/i,/^Storage \(GB\)/i,/Rear Camera - Resolution/i,/Front Camera - Resolution/i,/Battery Capacity/i,/Capacity/i,/Star Rating|Energy/i,/Sound Output/i,/^HDMI$/i,/^OS$/i,/Dimension|Net Dimension/i,/Weight/i];
+var KEY_ORDER=[/ > Product Type$/i,/^(OS|Operating System) > /i,/Size \(Main Display\)|Screen Size|^Display > Size$/i,/ > Resolution( \(Main Display\))?$/i,/Technology \(Main Display\)|Panel Type|^Display > Type$/i,/ > (Max )?Refresh Rate( \(Main Display\))?$/i,/ > (CPU Type|CPU|Processor)$/i,/ > CPU Speed$/i,/ > (Memory \(GB\)|Memory Capacity)$/i,/ > (Storage \(GB\)|Storage Capacity)$/i,/Rear Camera - Resolution/i,/Front Camera - Resolution/i,/Number of Channel/i,/Sound Output/i,/ > Dolby$/i,/Active Noise Cancellation/i,/Total Music Play Time \(Hours, ANC Off\)/i,/Net Total\(Liter\)|Washing Capacity|^Capacity > | > Capacity$/i,/Energy Star Rating|Energy Efficiency Class|Energy Grade/i,/ISEER/i,/Cooling Type|Spin Speed| > Motor$| > Compressor$/i,/Battery Capacity/i,/ > (HDMI|HDMI In)$/i,/ > Durability$/i,/Noise Level/i,/Dimension[^>]*$/i,/Weight[^>]*$/i];
 
 var seq=0, current=null;
 function $(id){return document.getElementById(id);}
@@ -181,8 +181,8 @@ function build(code,card,spec,siblings){
   });
   var picked=[];
   KEY_ORDER.forEach(function(re){
-    if(picked.length>=10)return;
-    for(var i=0;i<p.rows.length;i++){var r=p.rows[i];if(re.test(r.n)&&picked.indexOf(r)<0&&r.v.length<90){picked.push(r);return;}}
+    if(picked.length>=12)return;
+    for(var i=0;i<p.rows.length;i++){var r=p.rows[i];if(re.test(r.g+' > '+r.n)&&picked.indexOf(r)<0&&r.v.length<110){picked.push(r);return;}}
   });
   for(var i=0;i<p.rows.length&&picked.length<6;i++){if(picked.indexOf(p.rows[i])<0&&p.rows[i].v.length<90)picked.push(p.rows[i]);}
   p.keys=picked;
@@ -235,7 +235,7 @@ function render(p,note){
   if(p.keys.length){
     var ks=el('section','panel');ks.appendChild(el('h2',null,'Key specifications'));
     var grid=el('div','keys');
-    p.keys.forEach(function(r){var kv=el('div','kv');kv.appendChild(el('span',null,r.n));kv.appendChild(el('span',null,r.v));grid.appendChild(kv);});
+    p.keys.forEach(function(r){var kv=el('div','kv');kv.appendChild(el('span',null,/^(Size|Type)$/i.test(r.n)?r.g+' '+r.n.toLowerCase():r.n));kv.appendChild(el('span',null,r.v));grid.appendChild(kv);});
     ks.appendChild(grid);out.appendChild(ks);
   }
   if(p.highlights.length){
