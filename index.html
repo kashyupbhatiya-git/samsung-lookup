@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Samsung Lookup</title>
+<style>
+/* Layout: one working column. Search bar on top, then price beside the product, key specs, full spec sheet. */
+:root{
+  --bg:#f3f5f9; --panel:#ffffff; --ink:#131a26; --muted:#5b6678; --line:#dbe1ea;
+  --accent:#1740c9; --accent-ink:#ffffff; --soft:#e9eefb; --good:#0c7a4d; --warn:#a2500a;
+  --sans:"Avenir Next","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0e131c; --panel:#161d29; --ink:#e8edf6; --muted:#9aa6ba; --line:#28324a;
+  --accent:#8fa9ff; --accent-ink:#0b1020; --soft:#1c2740; --good:#4fd39a; --warn:#f0a35c; color-scheme:dark;
+}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--sans)}
+.wrap{max-width:940px;margin:0 auto;padding-block:28px 56px;padding-inline:16px;display:flex;flex-direction:column;gap:18px}
+h1{font-size:22px;margin:0;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:2px 0 0}
+form{display:flex;gap:8px;flex-wrap:wrap}
+input[type=text]{flex:1 1 240px;min-width:0;font:600 17px/1.2 var(--mono);padding:13px 14px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);text-transform:uppercase}
+input[type=text]::placeholder{text-transform:none;font-weight:400;color:var(--muted)}
+button{font:600 15px/1.2 var(--sans);border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:10px 14px;cursor:pointer}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);padding:13px 22px}
+button:disabled{opacity:.6;cursor:default}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;color:var(--muted);font-size:13px}
+.chip{font:500 12.5px/1.2 var(--mono);padding:6px 9px;border-radius:999px;background:var(--soft);border:0;color:var(--ink)}
+#out{display:flex;flex-direction:column;gap:18px}
+#out:empty{display:none}
+.note{padding:11px 14px;border-radius:8px;background:var(--soft);font-size:14px}
+.note.err{background:transparent;border:1px solid var(--warn);color:var(--warn)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
+.head{display:grid;grid-template-columns:150px minmax(0,1fr) minmax(0,260px);gap:20px;align-items:start}
+.head img{width:150px;height:150px;object-fit:contain;background:#fff;border-radius:8px}
+.name{font-size:20px;font-weight:700;line-height:1.25;margin:0 0 6px;text-wrap:balance}
+.code{font:600 14px var(--mono);letter-spacing:.02em}
+.meta{color:var(--muted);font-size:13.5px;margin-top:4px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.tag{font-size:12.5px;padding:3px 8px;border:1px solid var(--line);border-radius:6px}
+.price{border-left:1px solid var(--line);padding-left:20px}
+.lbl{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.amt{font-size:30px;font-weight:700;letter-spacing:-.01em;font-variant-numeric:tabular-nums;line-height:1.15}
+.mrp{color:var(--muted);font-size:13.5px;font-variant-numeric:tabular-nums}
+.mrp s{margin-right:6px}
+.save{color:var(--good);font-weight:600}
+.stock{display:inline-block;margin-top:8px;font-size:12.5px;font-weight:600;padding:3px 9px;border-radius:999px;border:1px solid currentColor}
+.stock.in{color:var(--good)} .stock.out{color:var(--warn)}
+.small{font-size:12.5px;color:var(--muted);margin-top:8px}
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.actions a{color:var(--accent);font-weight:600;text-decoration:none;padding:10px 4px}
+.actions .said{font-size:13px;color:var(--good)}
+h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 12px;font-weight:700}
+.keys{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:0 28px}
+.kv{display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px solid var(--line)}
+.kv span:first-child{color:var(--muted);flex:0 1 46%}
+.kv span:last-child{font-weight:600;text-align:right;min-width:0;overflow-wrap:anywhere}
+ul.hl{margin:0;padding-left:18px;display:grid;gap:6px}
+ul.hl b{font-weight:600}
+.sheethead{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:6px}
+.sheethead h2{margin:0}
+.sheethead input{flex:0 1 240px;font:400 14px var(--sans);padding:8px 10px;text-transform:none}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+th.g{text-align:left;font-size:13.5px;padding:18px 0 6px;border-bottom:2px solid var(--line)}
+td{padding:8px 0;border-bottom:1px solid var(--line);vertical-align:top;overflow-wrap:anywhere}
+td:first-child{width:38%;color:var(--muted);padding-right:16px}
+.pick{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.pick button{display:flex;justify-content:space-between;gap:14px;align-items:center;text-align:left;font-weight:500;padding:12px 14px}
+.pick .pn{min-width:0}
+.pick .pc{font:600 12.5px var(--mono);color:var(--muted);display:block;margin-top:2px}
+.pick .pp{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+footer{color:var(--muted);font-size:12.5px}
+@media (max-width:720px){
+  .head{grid-template-columns:96px minmax(0,1fr)}
+  .head img{width:96px;height:96px}
+  .price{grid-column:1/-1;border-left:0;border-top:1px solid var(--line);padding:14px 0 0}
+  td:first-child{width:44%}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Samsung Lookup</h1>
+    <p class="sub">Type a model number to pull its price and specifications from samsung.com/in.</p>
+  </header>
+
+  <form id="f" autocomplete="off">
+    <input type="text" id="q" placeholder="Model number, e.g. SM-S948BZKBINS" aria-label="Model number" spellcheck="false" autofocus>
+    <button class="primary" id="go" type="submit">Look up</button>
+  </form>
+  <div class="chips" id="chips"></div>
+  <div id="msg" class="note" hidden role="status"></div>
+  <div id="out"></div>
+
+  <footer>Prices and specifications are read live from Samsung India's website each time you look a model up. Nothing is stored except your recent model numbers, in this browser. This is an unofficial tool and is not affiliated with Samsung.</footer>
+</div>
+
+<script>
+(function(){
+var API='https://searchapi.samsung.com/v6/front/b2c/product/';
+var SUFFIXES=['','INS','LXL','XL','XXL','TL','HL','NL','NA','IN'];
+var SITE='https://www.samsung.com';
+var EXAMPLES=['SM-S948BZKBINS','QA55S95HXULXL','RT56HG7A61SLTL'];
+var KEY_ORDER=[/^Product Type$/i,/Size \(Main Display\)|Screen Size/i,/^Resolution/i,/Technology \(Main Display\)/i,/Refresh Rate/i,/CPU Type|^Processor$/i,/CPU Speed/i,/^Memory \(GB\)/i,/^Storage \(GB\)/i,/Rear Camera - Resolution/i,/Front Camera - Resolution/i,/Battery Capacity/i,/Capacity/i,/Star Rating|Energy/i,/Sound Output/i,/^HDMI$/i,/^OS$/i,/Dimension|Net Dimension/i,/Weight/i];
+
+var seq=0, current=null;
+function $(id){return document.getElementById(id);}
+function el(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
+var ta=document.createElement('textarea');
+function clean(s){if(s==null)return '';s=String(s).replace(/<br\s*\/?>/gi,', ').replace(/<[^>]*>/g,'');ta.innerHTML=s;return ta.value.replace(/\s+/g,' ').trim();}
+function alnum(s){return String(s||'').toUpperCase().replace(/[^A-Z0-9]/g,'');}
+function num(v){var n=parseFloat(v);return isFinite(n)&&n>0?n:null;}
+function inr(n){return n==null?'':new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(n);}
+function abs(u){if(!u)return '';if(u.indexOf('//')===0)return 'https:'+u;if(u.charAt(0)==='/')return SITE+u;return u;}
+
+function getJSON(url,opts){
+  var ctl=new AbortController();var t=setTimeout(function(){ctl.abort();},25000);
+  opts=opts||{};opts.signal=ctl.signal;
+  return fetch(url,opts).then(function(r){
+    if(!r.ok)throw new Error('Samsung answered with error '+r.status);
+    return r.json();
+  }).finally(function(){clearTimeout(t);});
+}
+function candidates(q){
+  var bases=[q];var m=/^SM([A-Z]\d.*)$/.exec(q);if(m)bases.push('SM-'+m[1]);
+  var out=[];bases.forEach(function(b){SUFFIXES.forEach(function(x){out.push(b+x);});});return out;
+}
+function fetchFamily(codes){
+  var u=API+'card/detail/newhybris?siteCode=in&modelList='+encodeURIComponent(codes.join(','))+'&commonCodeYN=N&saleSkuYN=N&onlyRequestSkuYN=N&keySummaryYN=Y&shopSiteCode=in';
+  return getJSON(u).then(function(j){
+    var list=(((j||{}).response||{}).resultData||{}).productList||[];
+    for(var c=0;c<codes.length;c++){for(var i=0;i<list.length;i++){var ms=list[i].modelList||[];for(var k=0;k<ms.length;k++){
+      if(ms[k].modelCode===codes[c])return {card:ms[k],siblings:ms.filter(function(x){return x!==ms[k];})};
+    }}}
+    return null;
+  });
+}
+function fetchSpec(code){
+  return getJSON(API+'spec/detail?siteCode=in&modelList='+encodeURIComponent(code)).then(function(j){
+    var list=(((j||{}).response||{}).resultData||{}).modelList||[];return list[0]||null;
+  });
+}
+function prices(card){
+  var list=num(card.price),promo=num(card.promotionPrice);
+  if(promo&&list&&promo<list)return {price:promo,mrp:list};
+  return {price:promo||list,mrp:null};
+}
+function tagsOf(card){return (card.fmyChipList||[]).map(function(c){var t=clean(c.fmyChipLocalName||c.fmyChipName);return (/SIZE/i.test(c.fmyChipType||'')&&/^\d+$/.test(t))?t+' inch':t;}).filter(Boolean);}
+
+function build(code,card,spec,siblings){
+  var p={code:code,name:'',category:'',image:'',price:null,mrp:null,stock:'',emi:'',offer:'',url:'',tags:[],rating:'',highlights:[],groups:[],rows:[],variants:[]};
+  if(card){
+    p.code=card.modelCode||code;p.name=clean(card.displayName);
+    p.category=[card.pviTypeName,card.pviSubtypeName].map(clean).filter(Boolean).join(' / ');
+    p.image=abs(card.thumbUrl);p.url=abs(card.originPdpUrl||card.pdpUrl);
+    var pr=prices(card);p.price=pr.price;p.mrp=pr.mrp;
+    p.stock=card.stockStatusText||card.ctaType||'';
+    p.emi=clean((card.financingDesc||[])[0]);
+    p.offer=clean((card.topFlags||{}).iconTitle);
+    p.tags=tagsOf(card);
+    if(num(card.ratings))p.rating=parseFloat(card.ratings).toFixed(1)+' / 5 from '+Number(card.reviewCount||0).toLocaleString('en-IN')+' reviews';
+    (card.keySummary||[]).forEach(function(k){if(k.displayType==='Feature'&&k.title)p.highlights.push({t:clean(k.title),d:clean(k.description)});});
+  }
+  (siblings||[]).forEach(function(m){p.variants.push({code:m.modelCode,label:tagsOf(m).join(', ')||clean(m.displayName),price:prices(m).price});});
+  var items=(spec&&spec.spec&&spec.spec.specItems)||[];
+  items.forEach(function(g){
+    var gname=clean(g.attrName),rows=[];
+    (function walk(list,prefix){(list||[]).forEach(function(a){
+      var n=clean(a.attrName),v=clean(a.attrValue);
+      if(v)rows.push({n:prefix?prefix+' - '+n:n,v:v});
+      if(a.attrs&&a.attrs.length)walk(a.attrs,prefix?prefix+' - '+n:n);
+    });})(g.attrs,'');
+    if(!rows.length&&clean(g.attrValue))rows.push({n:gname,v:clean(g.attrValue)});
+    if(rows.length){p.groups.push({g:gname,rows:rows});rows.forEach(function(r){p.rows.push({g:gname,n:r.n,v:r.v});});}
+  });
+  var picked=[];
+  KEY_ORDER.forEach(function(re){
+    if(picked.length>=10)return;
+    for(var i=0;i<p.rows.length;i++){var r=p.rows[i];if(re.test(r.n)&&picked.indexOf(r)<0&&r.v.length<90){picked.push(r);return;}}
+  });
+  for(var i=0;i<p.rows.length&&picked.length<6;i++){if(picked.indexOf(p.rows[i])<0&&p.rows[i].v.length<90)picked.push(p.rows[i]);}
+  p.keys=picked;
+  p.checked=new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});
+  return p;
+}
+
+function stockLabel(p){
+  var s=String(p.stock||'');
+  if(/^inStock$/i.test(s))return ['In stock','in'];
+  if(/outOfStock/i.test(s))return ['Out of stock','out'];
+  if(/preOrder/i.test(s))return ['Pre-order','in'];
+  if(/comingSoon/i.test(s))return ['Coming soon','out'];
+  if(p.price==null)return ['Not sold on samsung.com/in','out'];
+  return null;
+}
+
+function render(p,note){
+  current=p;var out=$('out');out.textContent='';
+  if(note)say(note);
+  var panel=el('section','panel'),head=el('div','head');
+  if(p.image){var im=el('img');im.src=p.image;im.alt='';im.onerror=function(){im.hidden=true;};head.appendChild(im);}else{head.appendChild(el('div'));}
+  var info=el('div');
+  info.appendChild(el('p','name',p.name||p.code));
+  info.appendChild(el('div','code',p.code));
+  if(p.category)info.appendChild(el('div','meta',p.category));
+  if(p.rating)info.appendChild(el('div','meta','Rated '+p.rating));
+  if(p.tags.length){var tg=el('div','tags');p.tags.forEach(function(t){tg.appendChild(el('span','tag',t));});info.appendChild(tg);}
+  head.appendChild(info);
+  var pr=el('div','price');
+  pr.appendChild(el('div','lbl','Price on samsung.com/in'));
+  if(p.price!=null){
+    pr.appendChild(el('div','amt',inr(p.price)));
+    if(p.mrp){var m=el('div','mrp');m.appendChild(el('s',null,'MRP '+inr(p.mrp)));m.appendChild(el('span','save','You save '+inr(p.mrp-p.price)));pr.appendChild(m);}
+    else pr.appendChild(el('div','mrp','MRP, inclusive of all taxes'));
+  }else{pr.appendChild(el('div','amt','No price listed'));}
+  var st=stockLabel(p);if(st)pr.appendChild(el('span','stock '+st[1],st[0]));
+  if(p.offer)pr.appendChild(el('div','small','Offer: '+p.offer));
+  if(p.emi)pr.appendChild(el('div','small',p.emi));
+  pr.appendChild(el('div','small','Checked '+p.checked));
+  head.appendChild(pr);panel.appendChild(head);out.appendChild(panel);
+
+  var act=el('div','actions');
+  var b1=el('button',null,'Copy for Sheets');b1.type='button';b1.onclick=function(){copyText(toRows(p).map(function(r){return r.join('\t');}).join('\n'),said);};
+  var b2=el('button',null,'Download CSV');b2.type='button';b2.onclick=function(){download(p);};
+  var said=el('span','said');act.appendChild(b1);act.appendChild(b2);
+  if(p.url){var a=el('a',null,'Open on samsung.com');a.href=p.url;a.target='_blank';a.rel='noopener';act.appendChild(a);}
+  act.appendChild(said);out.appendChild(act);
+
+  if(p.keys.length){
+    var ks=el('section','panel');ks.appendChild(el('h2',null,'Key specifications'));
+    var grid=el('div','keys');
+    p.keys.forEach(function(r){var kv=el('div','kv');kv.appendChild(el('span',null,r.n));kv.appendChild(el('span',null,r.v));grid.appendChild(kv);});
+    ks.appendChild(grid);out.appendChild(ks);
+  }
+  if(p.highlights.length){
+    var hs=el('section','panel');hs.appendChild(el('h2',null,'Highlights'));
+    var ul=el('ul','hl');
+    p.highlights.forEach(function(h){var li=el('li');li.appendChild(el('b',null,h.t));if(h.d)li.appendChild(document.createTextNode(': '+h.d));ul.appendChild(li);});
+    hs.appendChild(ul);out.appendChild(hs);
+  }
+  if(p.variants.length){
+    var vs=el('section','panel');vs.appendChild(el('h2',null,'Other versions of this product'));
+    var vb=el('div','pick');
+    p.variants.forEach(function(v){
+      var b=el('button');b.type='button';var left=el('span','pn',v.label);left.appendChild(el('span','pc',v.code));
+      b.appendChild(left);b.appendChild(el('span','pp',v.price==null?'No price listed':inr(v.price)));
+      b.onclick=function(){$('q').value=v.code;lookup(v.code);window.scrollTo(0,0);};vb.appendChild(b);
+    });
+    vs.appendChild(vb);out.appendChild(vs);
+  }
+  var sh=el('section','panel');
+  if(p.groups.length){
+    var hd=el('div','sheethead');hd.appendChild(el('h2',null,'Full specifications ('+p.rows.length+')'));
+    var fi=el('input');fi.type='text';fi.id='filter';fi.placeholder='Filter, e.g. battery';fi.setAttribute('aria-label','Filter specifications');hd.appendChild(fi);sh.appendChild(hd);
+    var tb=el('table');
+    p.groups.forEach(function(g){
+      var body=el('tbody');var hr=el('tr');var th=el('th','g',g.g);th.colSpan=2;hr.appendChild(th);body.appendChild(hr);
+      g.rows.forEach(function(r){var tr=el('tr','r');tr.appendChild(el('td',null,r.n));tr.appendChild(el('td',null,r.v));tr.dataset.k=(g.g+' '+r.n+' '+r.v).toLowerCase();body.appendChild(tr);});
+      tb.appendChild(body);
+    });
+    sh.appendChild(tb);
+    fi.oninput=function(){var v=fi.value.trim().toLowerCase();
+      [].forEach.call(tb.tBodies,function(b){var any=false;[].forEach.call(b.querySelectorAll('tr.r'),function(tr){var ok=!v||tr.dataset.k.indexOf(v)>-1;tr.hidden=!ok;if(ok)any=true;});b.hidden=!any;});};
+  }else{
+    sh.appendChild(el('h2',null,'Full specifications'));
+    sh.appendChild(el('div',null,'Samsung India has not published a specification sheet for this model.'));
+  }
+  out.appendChild(sh);
+}
+
+function toRows(p){
+  var rows=[['Field','Value'],['Model number',p.code],['Product',p.name],['Category',p.category],['Price (INR)',p.price==null?'':String(p.price)],['MRP (INR)',String(p.mrp||p.price||'')],
+    ['Availability',(stockLabel(p)||[''])[0]],['Offer',p.offer],['Link',p.url],['Checked',p.checked]];
+  p.rows.forEach(function(r){rows.push([r.g===r.n?r.n:r.g+' - '+r.n,r.v]);});
+  return rows;
+}
+function copyText(text,said){
+  function done(ok){said.textContent=ok?'Copied. Paste into a sheet.':'Could not copy. Use Download CSV instead.';setTimeout(function(){said.textContent='';},4000);}
+  function legacy(){var t=el('textarea');t.value=text;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();var ok=false;try{ok=document.execCommand('copy');}catch(e){}t.remove();done(ok);}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(function(){done(true);},legacy);}else legacy();
+}
+function download(p){
+  var csv=toRows(p).map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\r\n');
+  var a=el('a');a.href=URL.createObjectURL(new Blob([String.fromCharCode(65279)+csv],{type:'text/csv'}));a.download=p.code+' specs.csv';document.body.appendChild(a);a.click();a.remove();
+}
+
+function say(text,err){var m=$('msg');m.textContent=text||'';m.className='note'+(err?' err':'');m.hidden=!text;}
+function busy(on){$('go').disabled=on;$('go').textContent=on?'Looking up...':'Look up';}
+function notFound(q){
+  var out=$('out');out.textContent='';current=null;
+  say('No product on samsung.com/in has the model number "'+q+'". Enter the full code as printed on the box or shown on the product page, for example SM-S948BZKBINS.',true);
+  var a=el('a',null,'Search samsung.com/in for "'+q+'"');a.href=SITE+'/in/search/?searchvalue='+encodeURIComponent(q);a.target='_blank';a.rel='noopener';
+  var w=el('div','actions');w.appendChild(a);out.appendChild(w);
+}
+function lookup(raw){
+  var q=String(raw||'').toUpperCase().replace(/\s+/g,'');
+  if(!q){say('Enter a model number first.',true);return Promise.resolve();}
+  var my=++seq;busy(true);say('');
+  return fetchFamily(candidates(q)).then(function(hit){
+    if(my!==seq)return;
+    if(!hit){notFound(q);return;}
+    var code=hit.card.modelCode;
+    return fetchSpec(code).catch(function(){return null;}).then(function(spec){
+      if(my!==seq)return;
+      var p=build(code,hit.card,spec,hit.siblings);
+      render(p,code===q?'':'Showing '+code+', the full Samsung India code for "'+q+'".');remember(p);
+    });
+  }).catch(function(e){
+    if(my!==seq)return;$('out').textContent='';
+    var off=(e&&(e.name==='AbortError'||e.name==='TypeError'));
+    say(off?'Could not reach samsung.com. Check your internet connection and try again.':((e&&e.message)||'Something went wrong')+'. Try again in a minute.',true);
+  }).then(function(){if(my===seq)busy(false);});
+}
+
+function recent(){try{return JSON.parse(localStorage.getItem('samsungLookup.recent')||'[]');}catch(e){return [];}}
+function remember(p){
+  var list=recent().filter(function(c){return c!==p.code;});list.unshift(p.code);list=list.slice(0,8);
+  try{localStorage.setItem('samsungLookup.recent',JSON.stringify(list));}catch(e){}
+  chips();
+}
+function chips(){
+  var box=$('chips');box.textContent='';var list=recent();var label=list.length?'Recent:':'Try:';
+  if(!list.length)list=EXAMPLES;
+  box.appendChild(el('span',null,label));
+  list.forEach(function(c){var b=el('button','chip',c);b.type='button';b.onclick=function(){$('q').value=c;lookup(c);};box.appendChild(b);});
+}
+
+$('f').addEventListener('submit',function(e){e.preventDefault();lookup($('q').value);});
+chips();
+var h=decodeURIComponent((location.hash||'').slice(1));
+if(h){$('q').value=h;lookup(h);}
+})();
+</script>
+</body>
+</html>
