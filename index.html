@@ -12,7 +12,7 @@
   --bg:#eef0f6; --blob1:#a9c8ff; --blob2:#ffc7de; --blob3:#b5eedb;
   --glass:rgba(255,255,255,.60); --glass-strong:rgba(255,255,255,.72); --edge:rgba(255,255,255,.80); --shine:rgba(255,255,255,.75); --hair:rgba(60,60,67,.15);
   --ink:#1d1d1f; --muted:#5c5d63; --accent:#0066cc; --fill:#0071e3; --fill-ink:#ffffff; --good:#1a7f37; --warn:#b54708;
-  --shadow:0 10px 34px rgba(31,45,90,.13); --solid:#f7f8fc; --tint:rgba(0,113,227,.08);
+  --shadow:0 10px 34px rgba(31,45,90,.13); --solid:#f7f8fc; --tint:rgba(0,113,227,.08); --bar:rgba(250,251,254,.86);
   --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue","Segoe UI",Roboto,Arial,sans-serif;
   --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
 }
@@ -20,7 +20,7 @@
   --bg:#07080c; --blob1:#1c3f96; --blob2:#5b1f63; --blob3:#0e4f4b;
   --glass:rgba(44,46,58,.50); --glass-strong:rgba(72,75,90,.55); --edge:rgba(255,255,255,.14); --shine:rgba(255,255,255,.10); --hair:rgba(235,235,245,.15);
   --ink:#f5f5f7; --muted:#a9abb4; --accent:#58aeff; --fill:#0a78ea; --fill-ink:#ffffff; --good:#30d158; --warn:#ffa42e;
-  --shadow:0 14px 42px rgba(0,0,0,.50); --solid:#20222c; --tint:rgba(88,174,255,.14); color-scheme:dark;
+  --shadow:0 14px 42px rgba(0,0,0,.50); --solid:#20222c; --tint:rgba(88,174,255,.14); --bar:rgba(28,30,40,.86); color-scheme:dark;
 }}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -33,7 +33,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .wrap{max-width:940px;margin:0 auto;padding-block:30px 60px;padding-inline:16px;display:flex;flex-direction:column;gap:18px}
 h1{font-size:28px;font-weight:700;margin:0;letter-spacing:-.022em}
 .sub{color:var(--muted);margin:2px 0 0}
-.panel,.note,form,.chip,.actions button{background:var(--glass);-webkit-backdrop-filter:blur(26px) saturate(180%);backdrop-filter:blur(26px) saturate(180%);border:1px solid var(--edge);box-shadow:var(--shadow),inset 0 1px 0 var(--shine)}
+.panel,.note,form,.chip,.actions button,.seg,.chead{background:var(--glass);-webkit-backdrop-filter:blur(26px) saturate(180%);backdrop-filter:blur(26px) saturate(180%);border:1px solid var(--edge);box-shadow:var(--shadow),inset 0 1px 0 var(--shine)}
 form{display:flex;gap:8px;padding:8px;border-radius:26px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 10px);z-index:5}
 input[type=text]{flex:1 1 160px;min-width:0;font:600 17px/1.2 var(--mono);padding:12px 14px;border:0;border-radius:18px;background:transparent;color:var(--ink);text-transform:uppercase}
 input[type=text]::placeholder{text-transform:none;font-weight:400;font-family:var(--sans);color:var(--muted)}
@@ -101,19 +101,40 @@ td:first-child{width:38%;color:var(--muted);padding-right:16px}
 .vnav{top:50%;margin-top:-22px;width:44px;height:44px;padding:0 0 4px;font-size:28px;line-height:1}
 .vnav.prev{left:10px} .vnav.next{right:10px}
 .vcount{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);left:0;right:0;text-align:center;color:#fff;font-size:13px;font-variant-numeric:tabular-nums}
-.tray .gobtn{background:var(--fill);color:var(--fill-ink);border-color:transparent;padding:8px 14px;font-size:13.5px}
 .only{font-size:13.5px;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap}
-.cscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;--c0:132px;--cw:168px}
-.ctable th,.ctable td{padding:8px 10px;text-align:left}
-.ctable thead th{vertical-align:top;font-weight:500;border-bottom:1px solid var(--hair)}
-.ctable thead img{width:72px;height:72px;object-fit:contain;background:#fff;border-radius:12px;display:block;margin-bottom:8px}
-.ctable td:first-child,.ctable thead th:first-child{width:var(--c0);position:sticky;left:0;z-index:1;background:var(--solid);color:var(--muted)}
-.ctable th.g{padding:18px 10px 6px}
-.ctable tr.diff td{background:linear-gradient(var(--tint),var(--tint))}
-.ctable tr.diff td:first-child{background:linear-gradient(var(--tint),var(--tint)),var(--solid);color:var(--ink)}
-.ctable tr.diff td:not(:first-child){font-weight:600}
-.cname{display:block;background:none;border:0;padding:0;border-radius:6px;text-align:left;font:600 14px/1.3 var(--sans);color:var(--ink)}
-.crm{font-size:12px;padding:5px 10px;margin-top:8px}
+html{scroll-behavior:smooth}
+.seg{display:inline-flex;align-self:flex-start;gap:2px;padding:4px;border-radius:999px}
+.seg button{background:transparent;border:0;box-shadow:none;padding:9px 18px;font-size:14.5px;color:var(--muted)}
+.seg button[aria-pressed=true]{background:var(--glass-strong);color:var(--ink);box-shadow:0 2px 10px rgba(0,0,0,.12),inset 0 1px 0 var(--shine)}
+.mode-compare form{position:static}
+form,.chead{background:var(--bar);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%)}
+.actions button[aria-pressed=true]{background:var(--fill);color:var(--fill-ink);border-color:transparent}
+.fab{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);transform:translateX(-50%);z-index:6;white-space:nowrap;background:var(--fill);color:var(--fill-ink);border-color:rgba(255,255,255,.28);padding:14px 24px;box-shadow:0 12px 30px rgba(0,113,227,.42),inset 0 1px 0 rgba(255,255,255,.35)}
+.fab:active{transform:translateX(-50%) scale(.97)}
+.has-fab .wrap{padding-bottom:120px}
+.in{animation:rise .26s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.cmp{display:flex;flex-direction:column;gap:14px;--lab:170px}
+.chead{position:sticky;top:calc(env(safe-area-inset-top,0px) + 8px);z-index:4;display:grid;grid-template-columns:var(--lab) minmax(0,1fr);align-items:end;padding:12px 20px;border-radius:22px}
+.cspace{font-size:12.5px;color:var(--muted);padding-bottom:2px}
+.ccols{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:12px}
+.ccard{position:relative;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+.ccard.noimg{padding-right:28px}
+.ccard img{width:52px;height:52px;object-fit:contain;background:#fff;border-radius:10px;margin-bottom:4px}
+.ccard.empty{padding:8px;min-height:84px;align-items:center;justify-content:center;text-align:center;border:1.5px dashed var(--hair);border-radius:14px;color:var(--muted);font-size:13px}
+.cx{position:absolute;top:0;right:0;width:26px;height:26px;padding:0 0 2px;font-size:17px;line-height:1}
+.cname{font:600 12.5px/1.25 var(--mono);color:var(--ink);overflow-wrap:anywhere;text-align:left}
+button.cname{background:none;border:0;box-shadow:none;padding:0;border-radius:4px;text-decoration:underline;text-decoration-color:var(--hair);text-underline-offset:3px}
+.ctitle{font-size:12.5px;line-height:1.3;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cprice{font-weight:700;font-variant-numeric:tabular-nums}
+.ctab{padding:6px 20px 14px}
+.csec h3{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:18px 0 6px;font-weight:700}
+.crow{display:grid;grid-template-columns:var(--lab) minmax(0,1fr);padding:8px;margin-inline:-8px;border-radius:10px;border-bottom:1px solid var(--hair)}
+.crow.diff{background:var(--tint);border-bottom-color:transparent;margin-block:2px}
+.clabel{color:var(--muted);padding-right:12px;min-width:0;overflow-wrap:anywhere}
+.cval{min-width:0;overflow-wrap:anywhere}
+.crow.diff .cval{font-weight:600}
+.crow .cval.none{color:var(--muted);font-weight:400}
 footer{color:var(--muted);font-size:12.5px}
 @media (max-width:720px){
   h1{font-size:25px}
@@ -121,36 +142,49 @@ footer{color:var(--muted);font-size:12.5px}
   .head img,.zoom{width:96px;height:96px}
   .price{grid-column:1/-1;border-left:0;border-top:1px solid var(--hair);padding:14px 0 0}
   td:first-child{width:44%}
-  .cscroll{--c0:98px;--cw:128px}
-  .ctable{font-size:13.5px}
-  .ctable th,.ctable td{padding:8px 8px}
-  .ctable thead img{width:60px;height:60px}
   button.primary{padding:12px 18px}
+  .cmp{--lab:0px}
+  .chead{grid-template-columns:minmax(0,1fr);padding:10px 14px}
+  .cspace{display:none}
+  .ccols{gap:8px}
+  .ccard img{width:40px;height:40px}
+  .ctitle{-webkit-line-clamp:1}
+  .ctab{padding:2px 14px 12px}
+  .crow{grid-template-columns:minmax(0,1fr);gap:3px}
+  .clabel{font-size:12.5px}
+  .cval{font-size:14px}
+  .cmp.n4 .ccols{gap:6px}
+  .cmp.n4 .cname{font-size:10.5px;letter-spacing:-.02em}
+  .cmp.n4 .cprice,.cmp.n4 .cval{font-size:13px}
+  .cmp.n4 .cx{width:22px;height:22px;font-size:15px}
 }
 @media (prefers-reduced-transparency:reduce){:root{--glass:#ffffff;--glass-strong:#f2f3f7}
-  .panel,.note,form,.chip,.actions button{-webkit-backdrop-filter:none;backdrop-filter:none}}
+  .panel,.note,form,.chip,.actions button,.seg,.chead{-webkit-backdrop-filter:none;backdrop-filter:none}}
 @media (prefers-reduced-transparency:reduce) and (prefers-color-scheme:dark){:root{--glass:#1c1d24;--glass-strong:#2a2c36}}
-@media (prefers-reduced-motion:reduce){button{transition:none}}
+@media (prefers-reduced-motion:reduce){button{transition:none}html{scroll-behavior:auto}.in{animation:none}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <h1>Samsung Lookup</h1>
-    <p class="sub">Type a model number to pull its price and specifications from samsung.com/in. Separate two to four with commas to compare them.</p>
+    <p class="sub">Type a model number to pull its price and specifications from samsung.com/in.</p>
   </header>
+
+  <div class="seg" id="seg" role="group" aria-label="Mode"><button type="button" id="tabL" aria-pressed="true">Look up</button><button type="button" id="tabC" aria-pressed="false">Compare</button></div>
 
   <form id="f" autocomplete="off">
     <input type="text" id="q" placeholder="Model number" aria-label="Model number" spellcheck="false" autofocus>
     <button class="primary" id="go" type="submit">Look up</button>
   </form>
   <div class="chips" id="chips"></div>
-  <div class="chips tray" id="tray" hidden></div>
   <div id="msg" class="note" hidden role="status"></div>
   <div id="out"></div>
 
   <footer>Prices and specifications are read live from Samsung India's website each time you look a model up. Nothing is stored except your recent model numbers, in this browser. This is an unofficial tool and is not affiliated with Samsung.</footer>
 </div>
+
+<button type="button" class="fab" id="fab" hidden></button>
 
 <script>
 (function(){
@@ -289,7 +323,9 @@ function render(p,note){
   var act=el('div','actions');
   var b1=el('button',null,'Copy for Sheets');b1.type='button';b1.onclick=function(){copyText(toRows(p).map(function(r){return r.join('\t');}).join('\n'),said);};
   var b2=el('button',null,'Download CSV');b2.type='button';b2.onclick=function(){download(p);};
-  var b3=el('button',null,cmpHas(p.code)?'Remove from compare':'Add to compare');b3.type='button';b3.onclick=function(){cmpToggle(p);b3.textContent=cmpHas(p.code)?'Remove from compare':'Add to compare';};
+  var b3=el('button');b3.type='button';
+  function b3t(){var on=cmpHas(p.code);b3.textContent=on?String.fromCharCode(10003)+' In compare':'Add to compare';b3.setAttribute('aria-pressed',on?'true':'false');}
+  b3.onclick=function(){if(cmpHas(p.code)){cmp=cmp.filter(function(c){return c.code!==p.code;});cmpSave();refresh();}else cmpAddProduct(p);b3t();};b3t();
   var said=el('span','said');act.appendChild(b3);act.appendChild(b1);act.appendChild(b2);
   if(p.url){var a=el('a',null,'Open on samsung.com');a.href=p.url;a.target='_blank';a.rel='noopener';act.appendChild(a);}
   act.appendChild(said);out.appendChild(act);
@@ -334,6 +370,7 @@ function render(p,note){
     sh.appendChild(el('div',null,'Samsung India has not published a specification sheet for this model.'));
   }
   out.appendChild(sh);
+  [].forEach.call(out.children,function(c){c.classList.add('in');});
 }
 
 function toRows(p){
@@ -353,7 +390,7 @@ function download(p){
 }
 
 function say(text,err){var m=$('msg');m.textContent=text||'';m.className='note'+(err?' err':'');m.hidden=!text;}
-function busy(on){$('go').disabled=on;$('go').textContent=on?'Looking up...':'Look up';}
+function busy(on){$('go').disabled=on;$('go').textContent=on?'Looking up...':(mode==='compare'?'Add':'Look up');}
 function notFound(q){
   var out=$('out');out.textContent='';current=null;inCompare=false;
   say('No product on samsung.com/in has the model number "'+q+'". Enter the full code as printed on the box or shown on the product page, for example SM-S948BZKBINS.',true);
@@ -374,7 +411,7 @@ function fail(e,my){
 }
 function lookup(raw){
   var parts=String(raw||'').split(/[,;]+/).map(norm).filter(Boolean);
-  if(parts.length>1)return compareTyped(parts.slice(0,4));
+  if(parts.length>1){setMode('compare');addCodes(parts);return Promise.resolve();}
   var q=parts[0];
   if(!q){say('Enter a model number first.',true);return Promise.resolve();}
   var my=++seq;busy(true);say('');
@@ -386,98 +423,122 @@ function lookup(raw){
   }).catch(function(e){fail(e,my);}).then(function(){if(my===seq)busy(false);});
 }
 
-var cmp=[];
-try{cmp=JSON.parse(localStorage.getItem('samsungLookup.compare')||'[]').slice(0,4).map(function(c){return {code:String(c),p:null};});}catch(e){cmp=[];}
-function cmpSave(){try{localStorage.setItem('samsungLookup.compare',JSON.stringify(cmp.map(function(c){return c.code;})));}catch(e){}}
+var MAXC=4,cmp=[],mode='lookup',onlyDiff=false;
+try{cmp=JSON.parse(localStorage.getItem('samsungLookup.compare')||'[]').slice(0,MAXC).map(function(c){return {code:String(c),p:null};});}catch(e){cmp=[];}
+function cmpSave(){try{localStorage.setItem('samsungLookup.compare',JSON.stringify(cmp.filter(function(c){return !c.pending;}).map(function(c){return c.code;})));}catch(e){}}
 function cmpHas(code){return cmp.some(function(c){return c.code===code;});}
-function cmpDrop(code){cmp=cmp.filter(function(c){return c.code!==code;});cmpSave();tray();}
-function cmpToggle(p){
-  if(cmpHas(p.code)){cmpDrop(p.code);return;}
-  if(cmp.length>=4){say('You can compare up to 4 products. Remove one first.',true);return;}
-  cmp.push({code:p.code,p:p});cmpSave();tray();
+function cmpGone(item){cmp=cmp.filter(function(c){return c!==item;});}
+function refresh(){fab();segCount();if(mode==='compare'){chips();board(false);}}
+function cmpAddProduct(p){
+  if(cmp.length>=MAXC){say('You can compare up to '+MAXC+' products. Remove one in the Compare tab first.',true);return;}
+  cmp.push({code:p.code,p:p});cmpSave();refresh();
 }
-function tray(){
-  var box=$('tray');box.textContent='';box.hidden=!cmp.length;
-  box.appendChild(el('span',null,'Compare:'));
-  cmp.forEach(function(c){var b=el('button','chip',c.code+' '+String.fromCharCode(215));b.type='button';b.setAttribute('aria-label','Remove '+c.code+' from compare');
-    b.onclick=function(){cmpDrop(c.code);if(inCompare)showCompared([]);else if(current&&current.code===c.code)render(current,'');};box.appendChild(b);});
-  if(cmp.length>1){var go=el('button','gobtn','Compare '+cmp.length);go.type='button';go.onclick=compare;box.appendChild(go);}
-  else box.appendChild(el('span',null,'Add one more product to compare.'));
+function offline(){say('Could not reach samsung.com. Check your internet connection and try again.',true);}
+function addCodes(list){
+  var full=false;say('');
+  list.forEach(function(q){
+    if(cmpHas(q))return;
+    if(cmp.length>=MAXC){full=true;return;}
+    var item={code:q,p:null,loading:true,pending:true};cmp.push(item);
+    load(q).then(function(r){
+      if(cmp.indexOf(item)<0)return;
+      if(!r){cmpGone(item);say('No product on samsung.com/in has the model number "'+q+'".',true);}
+      else if(cmp.some(function(c){return c!==item&&c.code===r.p.code;})){cmpGone(item);say(r.p.code+' is already in the comparison.');}
+      else{item.code=r.p.code;item.p=r.p;item.loading=false;item.pending=false;remember(r.p);}
+      cmpSave();refresh();
+    }).catch(function(){if(cmp.indexOf(item)<0)return;cmpGone(item);refresh();offline();});
+  });
+  if(full)say('You can compare up to '+MAXC+' products. Remove one first.',true);
+  refresh();
 }
-function compare(){
-  if(cmp.length<2)return Promise.resolve();
-  var my=++seq;busy(true);say('');
-  return Promise.all(cmp.map(function(c){return c.p?c.p:load(c.code).then(function(r){if(r)c.p=r.p;});})).then(function(){
-    if(my!==seq)return;
-    var gone=cmp.filter(function(c){return !c.p;}).map(function(c){return c.code;});
-    if(gone.length){cmp=cmp.filter(function(c){return c.p;});cmpSave();tray();}
-    showCompared(gone);
-  }).catch(function(e){fail(e,my);}).then(function(){if(my===seq)busy(false);});
+function ensureLoaded(){
+  cmp.forEach(function(item){
+    if(item.p||item.loading||item.failed)return;
+    item.loading=true;
+    load(item.code).then(function(r){
+      item.loading=false;if(cmp.indexOf(item)<0)return;
+      if(r){item.p=r.p;item.code=r.p.code;}else cmpGone(item);
+      cmpSave();refresh();
+    }).catch(function(){item.loading=false;item.failed=true;if(cmp.indexOf(item)<0)return;refresh();offline();});
+  });
 }
-function compareTyped(list){
-  var my=++seq;busy(true);say('');
-  return Promise.all(list.map(function(q){return load(q).then(function(r){return {q:q,p:r&&r.p};});})).then(function(rs){
-    if(my!==seq)return;
-    var ok=[],bad=[];
-    rs.forEach(function(r){if(!r.p)bad.push(r.q);else if(!ok.some(function(c){return c.code===r.p.code;}))ok.push({code:r.p.code,p:r.p});});
-    cmp=ok;cmpSave();tray();showCompared(bad);
-  }).catch(function(e){fail(e,my);}).then(function(){if(my===seq)busy(false);});
+function segCount(){$('tabC').textContent='Compare'+(cmp.length?' ('+cmp.length+')':'');}
+function fab(){
+  var b=$('fab'),show=mode==='lookup'&&cmp.length>0;b.hidden=!show;document.body.classList.toggle('has-fab',show);
+  b.textContent=cmp.length>1?'Compare '+cmp.length+' products':'1 in compare. Add one more';
 }
-function showCompared(missing){
-  var note=missing.length?'Not found on samsung.com/in: '+missing.join(', ')+'.':'';
-  if(cmp.length>1)renderCompare(cmp.map(function(c){return c.p;}),note);
-  else if(cmp.length===1){$('q').value=cmp[0].code;render(cmp[0].p,(note?note+' ':'')+'Only one product to show, so there is nothing to compare yet.');}
-  else{$('out').textContent='';current=null;say(note||'Nothing to compare yet.',true);}
+function setMode(m){
+  seq++;mode=m;document.body.classList.toggle('mode-compare',m==='compare');
+  $('tabL').setAttribute('aria-pressed',m==='lookup'?'true':'false');$('tabC').setAttribute('aria-pressed',m==='compare'?'true':'false');
+  $('q').placeholder=m==='compare'?'Add a model number':'Model number';$('q').value='';
+  busy(false);say('');chips();fab();segCount();
+  if(m==='compare')board(true);else if(current)render(current,'');else $('out').textContent='';
 }
 function specLabel(r){return /^(Size|Type)$/i.test(r.n)?r.g+' '+r.n.toLowerCase():r.n;}
-function renderCompare(ps,note){
-  current=null;inCompare=true;var out=$('out');out.textContent='';say(note||'');
-  var data=[[''].concat(ps.map(function(p){return p.code;})),['Product'].concat(ps.map(function(p){return p.name;}))];
-  var act=el('div','actions');var cp=el('button',null,'Copy for Sheets');cp.type='button';var said=el('span','said');
-  cp.onclick=function(){copyText(data.map(function(r){return r.join('\t');}).join('\n'),said);};act.appendChild(cp);act.appendChild(said);
-  var panel=el('section','panel');
-  var hd=el('div','sheethead');hd.appendChild(el('h2',null,'Comparing '+ps.length+' products'));
-  var lab=el('label','only');var cb=el('input');cb.type='checkbox';cb.id='onlydiff';lab.appendChild(cb);lab.appendChild(document.createTextNode('Only differences'));hd.appendChild(lab);
-  panel.appendChild(hd);
-  var sc=el('div','cscroll'),tb=el('table','ctable');tb.style.minWidth='calc(var(--c0) + '+ps.length+' * var(--cw))';
-  var thead=el('thead'),tr0=el('tr');tr0.appendChild(el('th'));
-  ps.forEach(function(p){
-    var th=el('th');
-    if(p.image){var im=el('img');im.src=p.image;im.alt='';im.onerror=function(){im.remove();};th.appendChild(im);}
-    var nb=el('button','cname',p.name||p.code);nb.type='button';nb.onclick=function(){$('q').value=p.code;lookup(p.code);window.scrollTo(0,0);};th.appendChild(nb);
-    th.appendChild(el('div','pc',p.code));
-    var rm=el('button','crm','Remove');rm.type='button';rm.onclick=function(){cmpDrop(p.code);showCompared([]);};th.appendChild(rm);
-    tr0.appendChild(th);
+function board(animate){
+  ensureLoaded();
+  var out=$('out');out.textContent='';
+  var ready=cmp.filter(function(c){return c.p;});
+  var wrap=el('section','cmp n'+cmp.length+(animate?' in':''));wrap.style.setProperty('--n',Math.max(cmp.length,2));
+  var head=el('div','chead');head.appendChild(el('div','cspace',cmp.length?cmp.length+' of '+MAXC+' products':''));
+  var cols=el('div','ccols');
+  cmp.forEach(function(c){
+    var card=el('div','ccard'+(c.p&&c.p.image?'':' noimg'));
+    var rm=el('button','cx',String.fromCharCode(215));rm.type='button';rm.setAttribute('aria-label','Remove '+c.code);rm.onclick=function(){cmpGone(c);cmpSave();refresh();};card.appendChild(rm);
+    if(c.p){
+      if(c.p.image){var im=el('img');im.src=c.p.image;im.alt='';im.onerror=function(){im.remove();card.classList.add('noimg');};card.appendChild(im);}
+      var nb=el('button','cname',c.p.code);nb.type='button';nb.setAttribute('aria-label','Open '+c.p.code);
+      nb.onclick=function(){current=c.p;setMode('lookup');$('q').value=c.p.code;window.scrollTo(0,0);};card.appendChild(nb);
+      card.appendChild(el('div','ctitle',c.p.name));
+      card.appendChild(el('div','cprice',c.p.price==null?'No price':inr(c.p.price)));
+    }else{card.appendChild(el('div','cname',c.code));card.appendChild(el('div','ctitle',c.failed?'Could not load':'Loading...'));}
+    cols.appendChild(card);
   });
-  thead.appendChild(tr0);tb.appendChild(thead);
+  for(var i=cmp.length;i<2;i++)cols.appendChild(el('div','ccard empty',i===0?'First product':'Second product'));
+  head.appendChild(cols);
+  if(ready.length<2){
+    wrap.appendChild(head);
+    var hint=el('section','panel');
+    hint.appendChild(el('div',null,cmp.length<2?'Add at least two products to compare them side by side. Type a model number in the box above and tap Add'+(recent().length?', or tap one of your recent lookups.':'.'):'Loading products...'));
+    wrap.appendChild(hint);out.appendChild(wrap);return;
+  }
+  var data=[['Model number'].concat(cmp.map(function(c){return c.code;})),['Product'].concat(cmp.map(function(c){return c.p?c.p.name:'';}))];
+  var act=el('div','actions'),said=el('span','said');
+  var lab=el('label','only'),cb=el('input');cb.type='checkbox';cb.id='onlydiff';cb.checked=onlyDiff;lab.appendChild(cb);lab.appendChild(document.createTextNode('Only differences'));
+  var cp=el('button',null,'Copy for Sheets');cp.type='button';cp.onclick=function(){copyText(data.map(function(r){return r.join('\t');}).join('\n'),said);};
+  var clr=el('button',null,'Clear all');clr.type='button';clr.onclick=function(){cmp=[];cmpSave();refresh();};
+  act.appendChild(cp);act.appendChild(clr);act.appendChild(lab);act.appendChild(said);
+  var panel=el('section','panel ctab');
+  function col(fn){return cmp.map(function(c){return c.p?fn(c.p):'';});}
   function section(title,rows){
     rows=rows.filter(function(r){return r[1].some(Boolean);});if(!rows.length)return;
-    var body=el('tbody'),hr=el('tr'),th=el('th','g',title);th.colSpan=ps.length+1;hr.appendChild(th);body.appendChild(hr);
+    var sec=el('div','csec');sec.appendChild(el('h3',null,title));
     rows.forEach(function(r){
-      var set={};r[1].forEach(function(v){set[v||'']=1;});var diff=Object.keys(set).length>1;
-      var tr=el('tr','r'+(diff?' diff':''));tr.appendChild(el('td',null,r[0]));
-      r[1].forEach(function(v){tr.appendChild(el('td',null,v||'-'));});
-      body.appendChild(tr);data.push([r[0]].concat(r[1]));
+      var set={};cmp.forEach(function(c,i){if(c.p)set[r[1][i]||'']=1;});var diff=Object.keys(set).length>1;
+      var row=el('div','crow'+(diff?' diff':''));row.appendChild(el('div','clabel',r[0]));
+      var vs=el('div','ccols');r[1].forEach(function(v,i){vs.appendChild(el('div','cval'+(v?'':' none'),cmp[i].p?(v||'-'):'...'));});
+      row.appendChild(vs);sec.appendChild(row);data.push([r[0]].concat(r[1]));
     });
-    tb.appendChild(body);
+    panel.appendChild(sec);
   }
   section('Price',[
-    ['Price',ps.map(function(p){return p.price==null?'No price listed':inr(p.price);})],
-    ['MRP',ps.map(function(p){return p.mrp?inr(p.mrp):'';})],
-    ['You save',ps.map(function(p){return p.mrp?inr(p.mrp-p.price):'';})],
-    ['Availability',ps.map(function(p){return (stockLabel(p)||[''])[0];})],
-    ['Rating',ps.map(function(p){return p.rating;})],
-    ['Category',ps.map(function(p){return p.category;})]
+    ['Price',col(function(p){return p.price==null?'No price listed':inr(p.price);})],
+    ['MRP',col(function(p){return p.mrp?inr(p.mrp):'';})],
+    ['You save',col(function(p){return p.mrp?inr(p.mrp-p.price):'';})],
+    ['Availability',col(function(p){return (stockLabel(p)||[''])[0];})],
+    ['Rating',col(function(p){return p.rating;})],
+    ['Category',col(function(p){return p.category;})]
   ]);
-  var maps=ps.map(function(p){var m={};p.rows.forEach(function(r){var k=r.g+'|'+r.n;if(!(k in m))m[k]=r.v;});return m;});
+  var maps=cmp.map(function(c){var m={};if(c.p)c.p.rows.forEach(function(r){var k=r.g+'|'+r.n;if(!(k in m))m[k]=r.v;});return m;});
   function union(lists){var seen={},o=[];lists.forEach(function(l){l.forEach(function(r){var k=r.g+'|'+r.n;if(!seen[k]){seen[k]=1;o.push(r);}});});return o;}
   function vals(r){return maps.map(function(m){return m[r.g+'|'+r.n]||'';});}
-  var keyRows=union(ps.map(function(p){return p.keys;})),isKey={};keyRows.forEach(function(r){isKey[r.g+'|'+r.n]=1;});
+  var keyRows=union(ready.map(function(c){return c.p.keys;})),isKey={};keyRows.forEach(function(r){isKey[r.g+'|'+r.n]=1;});
   section('Key specifications',keyRows.map(function(r){return [specLabel(r),vals(r)];}));
-  var gseen={},gorder=[];ps.forEach(function(p){p.groups.forEach(function(g){if(!gseen[g.g]){gseen[g.g]=1;gorder.push(g.g);}});});
-  gorder.forEach(function(g){section(g,union(ps.map(function(p){return p.rows.filter(function(r){return r.g===g&&!isKey[r.g+'|'+r.n];});})).map(function(r){return [r.n,vals(r)];}));});
-  cb.onchange=function(){[].forEach.call(tb.tBodies,function(b){var any=false;[].forEach.call(b.querySelectorAll('tr.r'),function(tr){var ok=!cb.checked||tr.classList.contains('diff');tr.hidden=!ok;if(ok)any=true;});b.hidden=!any;});};
-  sc.appendChild(tb);panel.appendChild(sc);out.appendChild(act);out.appendChild(panel);
+  var gseen={},gorder=[];ready.forEach(function(c){c.p.groups.forEach(function(g){if(!gseen[g.g]){gseen[g.g]=1;gorder.push(g.g);}});});
+  gorder.forEach(function(g){section(g,union(ready.map(function(c){return c.p.rows.filter(function(r){return r.g===g&&!isKey[r.g+'|'+r.n];});})).map(function(r){return [r.n,vals(r)];}));});
+  function applyOnly(){[].forEach.call(panel.querySelectorAll('.csec'),function(sec){var any=false;[].forEach.call(sec.querySelectorAll('.crow'),function(row){var ok=!onlyDiff||row.classList.contains('diff');row.hidden=!ok;if(ok)any=true;});sec.hidden=!any;});}
+  cb.onchange=function(){onlyDiff=cb.checked;applyOnly();};applyOnly();
+  wrap.appendChild(act);wrap.appendChild(head);wrap.appendChild(panel);out.appendChild(wrap);
 }
 
 var viewer=null,vImgs=[],vIdx=0;
@@ -517,12 +578,26 @@ function remember(p){
 }
 function chips(){
   var box=$('chips');box.textContent='';var list=recent();box.hidden=!list.length;
-  box.appendChild(el('span',null,'Recent:'));
-  list.forEach(function(c){var b=el('button','chip',c);b.type='button';b.onclick=function(){$('q').value=c;lookup(c);};box.appendChild(b);});
+  box.appendChild(el('span',null,mode==='compare'?'Add from recent:':'Recent:'));
+  list.forEach(function(c){
+    var b=el('button','chip',c);b.type='button';
+    if(mode==='compare'){b.disabled=cmpHas(c);b.onclick=function(){addCodes([c]);};}
+    else b.onclick=function(){$('q').value=c;lookup(c);};
+    box.appendChild(b);
+  });
 }
 
-$('f').addEventListener('submit',function(e){e.preventDefault();lookup($('q').value);});
-chips();tray();
+$('f').addEventListener('submit',function(e){
+  e.preventDefault();var v=$('q').value;
+  if(mode!=='compare'){lookup(v);return;}
+  var parts=String(v).split(/[,;]+/).map(norm).filter(Boolean);
+  if(!parts.length){say('Enter a model number to add.',true);return;}
+  $('q').value='';addCodes(parts);
+});
+$('tabL').onclick=function(){setMode('lookup');};
+$('tabC').onclick=function(){setMode('compare');};
+$('fab').onclick=function(){setMode('compare');window.scrollTo(0,0);};
+chips();fab();segCount();
 var h=decodeURIComponent((location.hash||'').slice(1));
 if(h){$('q').value=h;lookup(h);}
 })();
