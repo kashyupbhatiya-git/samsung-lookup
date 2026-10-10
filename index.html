@@ -128,7 +128,6 @@ var API='https://searchapi.samsung.com/v6/front/b2c/product/';
 var SUFFIXES=['','INS','INU','LXL','XL','XXL','TL','HL','NL','NA','IN','/XL','/TL','/HL','/NL','/WW','/XTL','XTL'];
 var TAILS=['XTL','INS','INU','LXL','XXL','XL','TL','HL','NL','NA','IN'];
 var SITE='https://www.samsung.com';
-var EXAMPLES=['SM-S948BZKBINS','QA55S95HXULXL','RT56HG7A61SLTL'];
 var KEY_ORDER=[/ > Product Type$/i,/^(OS|Operating System) > /i,/Size \(Main Display\)|Screen Size|^Display > Size$/i,/ > Resolution( \(Main Display\))?$/i,/Technology \(Main Display\)|Panel Type|^Display > Type$/i,/ > (Max )?Refresh Rate( \(Main Display\))?$/i,/ > (CPU Type|CPU|Processor)$/i,/ > CPU Speed$/i,/ > (Memory \(GB\)|Memory Capacity)$/i,/ > (Storage \(GB\)|Storage Capacity)$/i,/Rear Camera - Resolution/i,/Front Camera - Resolution/i,/Number of Channel/i,/Sound Output/i,/ > Dolby$/i,/Active Noise Cancellation/i,/Total Music Play Time \(Hours, ANC Off\)/i,/Net Total\(Liter\)|Washing Capacity|^Capacity > | > Capacity$/i,/Energy Star Rating|Energy Efficiency Class|Energy Grade/i,/ISEER/i,/Cooling Type|Spin Speed| > Motor$| > Compressor$/i,/Battery Capacity/i,/ > (HDMI|HDMI In)$/i,/ > Durability$/i,/Noise Level/i,/Dimension[^>]*$/i,/Weight[^>]*$/i];
 
 var seq=0, current=null;
@@ -353,9 +352,8 @@ function remember(p){
   chips();
 }
 function chips(){
-  var box=$('chips');box.textContent='';var list=recent();var label=list.length?'Recent:':'Try:';
-  if(!list.length)list=EXAMPLES;
-  box.appendChild(el('span',null,label));
+  var box=$('chips');box.textContent='';var list=recent();box.hidden=!list.length;
+  box.appendChild(el('span',null,'Recent:'));
   list.forEach(function(c){var b=el('button','chip',c);b.type='button';b.onclick=function(){$('q').value=c;lookup(c);};box.appendChild(b);});
 }
 
